@@ -1,0 +1,90 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src//generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProduceStatus {
+  AVAILABLE
+  SOLD_OUT
+}
+
+model User {
+  id                   Int             @id @default(autoincrement())
+  name                 String
+  email                String          @unique
+  username             String          @unique
+  phone                String
+  password             String
+  isAuthenticated      Boolean         @default(false)
+  twoFactorAuthEnabled Boolean         @default(false)
+  twoFactorAuthSecret  String?
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime?       @updatedAt
+  passwordResets       PasswordReset[]
+  otp                  Otp?
+  products             Product[]
+  orders               UserOrder[]
+
+  @@index([name, username])
+  @@map("user")
+}
+
+model PasswordReset {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @unique
+  token       String   @unique
+  tokenExpiry DateTime
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset")
+}
+
+model Otp {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("otp")
+}
+
+model Product {
+  id        Int           @id @default(autoincrement())
+  enName    String
+  arName    String
+  ckbName   String
+  enDesc    String        @db.Text
+  arDesc    String        @db.Text
+  ckbDesc   String        @db.Text
+  image     String
+  price     Float
+  status    ProduceStatus @default(AVAILABLE)
+  userId    Int
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime?     @updatedAt
+  orders    UserOrder[]
+
+  @@index([status, userId])
+  @@map("product")
+}
+
+model UserOrder {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([userId, productId])
+  @@map("user_order")
+}

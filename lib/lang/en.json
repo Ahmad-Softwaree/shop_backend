@@ -1,0 +1,180 @@
+{
+  "interceptors": {
+    "unique_fields": "Unique Fields interceptor failed",
+    "must_be_unique": "must be unique",
+    "not_found": "Requested data not found",
+    "invalid_model": "The specified model is invalid",
+    "user_not_found": "User not found",
+    "same_password": "The new password cannot be the same as the old password",
+    "same_password_error": "The new password must be different from the old password",
+    "same_password_options": "Same password interceptor options are required",
+    "empty_body": "Request body cannot be empty",
+    "password_mismatch": "Current password does not match",
+    "incorrect_password": "Current password is incorrect"
+  },
+  "guards": {
+    "noToken": "No token provided",
+    "token_destructor_failed": "Token destruction failed",
+    "account_not_verified": "Account not verified. Please check your email for verification code."
+  },
+  "tables": {
+    "users": "Users"
+  },
+  "message": {
+    "not_exist": "does not exist"
+  },
+  "controller": {
+    "auth": {
+      "wrong_credentials": "Wrong credentials",
+      "invalid_credentials": "Invalid email or password",
+      "register_success": "Registration successful! Welcome aboard.",
+      "email_in_use": "Email is already in use",
+      "username_in_use": "Username is already in use",
+      "passwords_not_match": "Passwords do not match",
+      "unauthorized": "Unauthorized. Please login.",
+      "user_not_found": "User not found",
+      "incorrect_password": "Current password is incorrect",
+      "password_change_success": "Password changed successfully",
+      "password_reset_email_sent": "Check your email for reset instructions",
+      "invalid_token": "Invalid or expired reset token",
+      "expired_token": "Reset token has expired",
+      "password_update_success": "Password updated successfully! Please login.",
+      "2fa_not_setup": "Two-Factor Authentication is not set up for this account",
+      "invalid_2fa_code": "Invalid authentication code. Please try again",
+      "2fa_activate_success": "Two-Factor Authentication enabled successfully!",
+      "2fa_deactivate_success": "Two-Factor Authentication disabled successfully!",
+      "failed_2fa_secret_generation": "Failed to generate 2FA secret",
+      "account_not_verified": "Account not verified. Please verify your email first.",
+      "no_otp_found": "No verification code found. Please request a new one.",
+      "otp_expired": "Verification code has expired. Please request a new one.",
+      "invalid_otp": "Invalid verification code. Please try again.",
+      "account_verified": "Account verified successfully! You can now login.",
+      "already_verified": "Account is already verified.",
+      "otp_sent": "Verification code sent to your email.",
+      "two_factor_auth_required": "Two-Factor Authentication is required for this account",
+      "logout_success": "Logged out successfully",
+      "valid_reset_token": "Reset token is valid"
+    },
+    "profile": {
+      "unauthorized": "Unauthorized. Please login.",
+      "user_not_found": "User not found",
+      "update_success": "Profile updated successfully"
+    },
+    "product": {
+      "create_success": "Product created successfully",
+      "update_success": "Product updated successfully",
+      "delete_success": "Product deleted successfully",
+      "not_found": "Product not found",
+      "unauthorized": "You are not authorized to perform this action on this product",
+      "buy_success": "Product purchased successfully",
+      "already_sold": "This product has already been sold",
+      "cannot_buy_own": "You cannot buy your own product",
+      "mark_available_success": "Product marked as available",
+      "not_sold_yet": "This product is not sold yet"
+    },
+    "shared": {
+      "image_deleted": "Image deleted successfully"
+    }
+  },
+  "validation": {
+    "global": {
+      "name": {
+        "isString": "Name must be a string",
+        "isNotEmpty": "Name is required",
+        "maxLength": "Name must be at most 100 characters"
+      },
+      "username": {
+        "isString": "Username must be a string",
+        "isNotEmpty": "Username is required",
+        "minLength": "Username must be at least 3 characters",
+        "maxLength": "Username must be at most 20 characters",
+        "pattern": "Username can only contain letters, numbers, and underscores"
+      },
+      "email": {
+        "isString": "Email must be a string",
+        "isNotEmpty": "Email is required",
+        "isEmail": "Invalid email address",
+        "maxLength": "Email must be at most 100 characters"
+      },
+      "phone": {
+        "isString": "Phone must be a string",
+        "isNotEmpty": "Phone is required",
+        "pattern": "Invalid phone number format",
+        "minLength": "Phone must be at least 10 characters",
+        "maxLength": "Phone must be at most 20 characters"
+      },
+      "password": {
+        "isString": "Password must be a string",
+        "isNotEmpty": "Password is required",
+        "minLength": "Password must be at least 8 characters",
+        "maxLength": "Password is too long"
+      }
+    },
+    "auth": {
+      "email": {
+        "isString": "Email must be a string",
+        "isNotEmpty": "Email is required"
+      },
+      "password": {
+        "isString": "Password must be a string",
+        "isNotEmpty": "Password is required",
+        "minLength": "Password must be at least 8 characters"
+      },
+      "confirmPassword": {
+        "isString": "Password confirmation must be a string",
+        "isNotEmpty": "Please confirm your password"
+      },
+      "currentPassword": {
+        "isString": "Current password must be a string",
+        "isNotEmpty": "Current password is required"
+      },
+      "code": {
+        "isString": "Code must be a string",
+        "isNotEmpty": "Code is required",
+        "minLength": "Code must be 6 digits",
+        "maxLength": "Code must be 6 digits"
+      },
+      "token": {
+        "isString": "Token must be a string",
+        "isNotEmpty": "Token is required"
+      }
+    },
+    "product": {
+      "enName": {
+        "isString": "English name must be a string",
+        "isNotEmpty": "English name is required",
+        "maxLength": "English name must be at most 100 characters"
+      },
+      "arName": {
+        "isString": "Arabic name must be a string",
+        "isNotEmpty": "Arabic name is required",
+        "maxLength": "Arabic name must be at most 100 characters"
+      },
+      "ckbName": {
+        "isString": "Kurdish name must be a string",
+        "isNotEmpty": "Kurdish name is required",
+        "maxLength": "Kurdish name must be at most 100 characters"
+      },
+      "enDesc": {
+        "isString": "English description must be a string",
+        "isNotEmpty": "English description is required"
+      },
+      "arDesc": {
+        "isString": "Arabic description must be a string",
+        "isNotEmpty": "Arabic description is required"
+      },
+      "ckbDesc": {
+        "isString": "Kurdish description must be a string",
+        "isNotEmpty": "Kurdish description is required"
+      },
+      "image": {
+        "isString": "Image must be a string",
+        "isNotEmpty": "Image is required"
+      },
+      "price": {
+        "isNumber": "Price must be a number",
+        "min": "Price must be at least 0"
+      }
+    }
+  }
+}
