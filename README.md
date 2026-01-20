@@ -26,9 +26,12 @@ Shop Backend is a production-ready NestJS API that provides:
 - **Language**: TypeScript
 - **Database**: PostgreSQL
 - **ORM**: Prisma 7.x
-- **Authentication**: JWT + bcrypt + otplib (2FA)
+- **Authentication**: JWT (Passport) + bcrypt + otplib (TOTP 2FA)
+- **File Upload**: Multer with validation and type safety
 - **Runtime**: Bun (package manager)
 - **Validation**: class-validator + class-transformer
+- **Security**: Helmet, CORS, rate limiting
+- **Architecture**: Modular with core global setup
 
 ## 📋 Prerequisites
 
@@ -209,8 +212,28 @@ prisma/
 
 For detailed guidelines and best practices:
 
+### Core Documentation
+
 - **[AGENTS.md](AGENTS.md)** - Comprehensive coding standards and architecture patterns
 - **[docs/prisma.md](docs/prisma.md)** - Prisma ORM guidelines, migrations, and query patterns
+
+### Feature Guides
+
+- **[docs/authentication-system.md](docs/authentication-system.md)** - JWT, Passport strategies, 2FA/OTP, password reset flows
+- **[docs/project-structure.md](docs/project-structure.md)** - CoreModule, common folder, essential project setup
+- **[docs/file-upload-system.md](docs/file-upload-system.md)** - Complete file upload implementation
+- **[docs/file-upload-quick-reference.md](docs/file-upload-quick-reference.md)** - Quick file upload reference
+- **[docs/file-upload-implementation-summary.md](docs/file-upload-implementation-summary.md)** - File upload summary
+
+### Quick References
+
+Each documentation file provides:
+
+- ✅ Architecture patterns and best practices
+- ✅ Code examples and usage patterns
+- ✅ Common pitfalls and solutions
+- ✅ Testing strategies
+- ✅ Security considerations
 
 ## 🛠️ Development Scripts
 

@@ -77,10 +77,12 @@ This file contains **strict coding standards and architecture patterns** for the
 #### **Authentication & Security**
 
 - **JWT** - @nestjs/jwt for token management
+- **Passport** - @nestjs/passport + passport-jwt for JWT strategy
 - **bcrypt** - Password hashing (NOT bcryptjs)
 - **otplib** - TOTP-based two-factor authentication
 - **helmet** - Security headers
 - **cookie-parser** - Cookie handling
+- **See**: [docs/authentication-system.md](docs/authentication-system.md) for complete auth architecture
 
 #### **Validation & Transformation**
 
@@ -112,9 +114,8 @@ This file contains **strict coding standards and architecture patterns** for the
 
 - ❌ Other ORMs: TypeORM, Sequelize, Mongoose (use Prisma only)
 - ❌ Other validation: Yup, Joi, Zod (use class-validator only)
-- ❌ Other auth: Passport.js (use @nestjs/jwt directly)
-- ❌ Express-specific middleware (use NestJS interceptors/guards)
 - ❌ Other password hashing: bcryptjs, argon2 (use bcrypt only)
+- ❌ Express-specific middleware (use NestJS interceptors/guards)
 - ❌ GraphQL (REST API only unless approved)
 
 Before adding ANY new library:
@@ -125,15 +126,41 @@ Before adding ANY new library:
 
 ---
 
+## 📖 Documentation Reference
+
+### Architecture & Setup
+
+- **[docs/project-structure.md](docs/project-structure.md)** - CoreModule setup, common folder organization, essential project files
+- **[docs/authentication-system.md](docs/authentication-system.md)** - JWT tokens, Passport strategies, 2FA/OTP, password reset
+- **[docs/prisma.md](docs/prisma.md)** - Database patterns, migrations, type-safe queries
+
+### Feature Implementation
+
+- **[docs/file-upload-system.md](docs/file-upload-system.md)** - Complete file upload with Multer, validation, type safety
+- **[docs/file-upload-quick-reference.md](docs/file-upload-quick-reference.md)** - Quick upload reference
+- **[docs/file-upload-implementation-summary.md](docs/file-upload-implementation-summary.md)** - Upload summary
+
+**When to Read Documentation:**
+
+- Setting up new project → Read `project-structure.md`
+- Adding authentication → Read `authentication-system.md`
+- Working with database → Read `prisma.md`
+- Implementing file uploads → Read `file-upload-system.md`
+
+---
+
 ## 📚 Architecture Guidelines
 
 ### 1️⃣ Module Organization
+
+**See**: [docs/project-structure.md](docs/project-structure.md) for core module patterns
 
 **Key Rules:**
 
 - ✅ Each feature has its own module (e.g., `auth/`, `user/`, `profile/`)
 - ✅ Modules must have: controller, service, DTOs, module file
 - ✅ Use `common/` for shared utilities (filters, interceptors, pipes, guards)
+- ✅ Use `core/` for global setup (filters, pipes, interceptors registered in CoreModule)
 - ❌ NO business logic in controllers - keep them thin
 - ❌ NO circular dependencies between modules
 
@@ -141,11 +168,21 @@ Before adding ANY new library:
 
 ```
 src/
+├── core/              # Global configuration (CoreModule)
+│   ├── core.module.ts
+│   ├── filters/       # Global exception filters
+│   ├── interceptors/  # Global interceptors
+│   └── pipes/         # Global validation pipes
+├── common/            # Shared utilities
+│   ├── decorators/    # Custom decorators
+│   ├── guards/        # Auth guards
+│   ├── interceptors/  # Feature interceptors
+│   └── pipes/         # Custom pipes
 ├── auth/              # Authentication module
 │   ├── auth.controller.ts
 │   ├── auth.service.ts
 │   ├── auth.module.ts
-│   ├── auth.guard.ts
+│   ├── strategies/    # Passport JWT strategy
 │   └── dto/
 ├── user/              # User management
 ├── profile/           # Profile updates
@@ -270,6 +307,8 @@ export class AuthController {
 
 ### 5️⃣ Interceptors & Guards
 
+**See**: [docs/authentication-system.md](docs/authentication-system.md) for JWT guard details
+
 **Key Interceptors:**
 
 - `EmptyBodyInterceptor` - Validates POST/PUT have non-empty bodies
@@ -278,8 +317,16 @@ export class AuthController {
 
 **Key Guards:**
 
-- `AuthGuard` - Validates JWT token and extracts userId
+- `JwtAuthGuard` (extends `AuthGuard('jwt')`) - Validates JWT token via Passport
+- `ClsMiddleware` - Stores userId in continuation-local storage (CLS)
 - Use `@Public()` decorator to bypass authentication
+
+**Authentication Flow:**
+
+1. Request → JwtAuthGuard validates token
+2. JWT Strategy (`auth/strategies/jwt.strategy.ts`) verifies token and extracts payload
+3. ClsMiddleware stores `userId` in request context
+4. Controller/Service accesses `userId` via `ClsService`
 
 **Usage:**
 
@@ -289,12 +336,20 @@ export class AuthController {
 async register(@Body() dto: RegisterDto) { }
 
 // Protected route
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 async getProfile() { }
 
-// Public route (bypasses AuthGuard)
+// Public route (bypasses JwtAuthGuard)
 @Public()
 async login(@Body() dto: LoginDto) { }
+
+// Access userId in service
+constructor(private clsService: ClsService) {}
+
+async getProfile() {
+  const userId = this.clsService.get('userId');
+  // Use userId for database queries
+}
 ```
 
 ### 6️⃣ Error Handling
@@ -359,10 +414,13 @@ Before writing ANY code:
 
 ### Authentication & Security
 
-- [ ] Did I use `@UseGuards(AuthGuard)` for protected routes?
+- [ ] See [docs/authentication-system.md](docs/authentication-system.md) for auth patterns
+- [ ] Did I use `@UseGuards(JwtAuthGuard)` for protected routes?
 - [ ] Did I use `@Public()` decorator for public routes?
 - [ ] Did I use `PasswordHashingInterceptor` for password fields?
 - [ ] Did I get userId from `ClsService` not request?
+- [ ] Am I handling JWT tokens correctly?
+- [ ] Did I implement 2FA/OTP if required?
 
 ### Interceptors & Guards
 
@@ -387,20 +445,26 @@ Before writing ANY code:
 
 ## 🎯 Quick Reference
 
-| Need             | Use                          | Example                                          |
-| ---------------- | ---------------------------- | ------------------------------------------------ |
-| Database query   | `PrismaService`              | `this.prisma.user.findUnique(...)`               |
-| Validation       | `class-validator`            | `@IsEmail()`, `@IsNotEmpty()`                    |
-| Password hashing | `PasswordHashingInterceptor` | `@UseInterceptors(PasswordHashingInterceptor)`   |
-| Protected route  | `AuthGuard`                  | `@UseGuards(AuthGuard)`                          |
-| Public route     | `@Public()` decorator        | `@Public()` above controller method              |
-| Error messages   | `LanguageService`            | `this.languageService.getText().controller.auth` |
-| Request user ID  | `ClsService`                 | `this.clsService.get('userId')`                  |
-| Response type    | `MessageResponse`            | `Promise<MessageResponse>`                       |
-| DTO composition  | `PickType`, `OmitType`       | `extends PickType(GlobalDto, ['email'])`         |
-| Migration        | Prisma CLI                   | `npx prisma migrate dev --name add-feature`      |
-| Seed database    | Bun script                   | `bun run db:seed`                                |
-| Start dev server | Bun                          | `bun run start:dev`                              |
+| Need             | Use                          | Example                                          | Reference                       |
+| ---------------- | ---------------------------- | ------------------------------------------------ | ------------------------------- |
+| Database query   | `PrismaService`              | `this.prisma.user.findUnique(...)`               | [prisma.md](docs/prisma.md)     |
+| Validation       | `class-validator`            | `@IsEmail()`, `@IsNotEmpty()`                    | -                               |
+| Password hashing | `PasswordHashingInterceptor` | `@UseInterceptors(PasswordHashingInterceptor)`   | [auth-system.md][auth]          |
+| Protected route  | `JwtAuthGuard`               | `@UseGuards(JwtAuthGuard)`                       | [auth-system.md][auth]          |
+| Public route     | `@Public()` decorator        | `@Public()` above controller method              | [auth-system.md][auth]          |
+| JWT Strategy     | Passport JWT                 | `auth/strategies/jwt.strategy.ts`                | [auth-system.md][auth]          |
+| 2FA/OTP          | otplib                       | `authenticator.generate(secret)`                 | [auth-system.md][auth]          |
+| File Upload      | Multer + Custom Pipe         | `@UseInterceptors(FileInterceptor('file'))`      | [file-upload-system.md][upload] |
+| Error messages   | `LanguageService`            | `this.languageService.getText().controller.auth` | -                               |
+| Request user ID  | `ClsService`                 | `this.clsService.get('userId')`                  | [auth-system.md][auth]          |
+| Response type    | `MessageResponse`            | `Promise<MessageResponse>`                       | -                               |
+| DTO composition  | `PickType`, `OmitType`       | `extends PickType(GlobalDto, ['email'])`         | -                               |
+| Migration        | Prisma CLI                   | `npx prisma migrate dev --name add-feature`      | [prisma.md](docs/prisma.md)     |
+| Seed database    | Bun script                   | `bun run db:seed`                                | [prisma.md](docs/prisma.md)     |
+| Start dev server | Bun                          | `bun run start:dev`                              | -                               |
+
+[auth]: docs/authentication-system.md
+[upload]: docs/file-upload-system.md
 
 ---
 
@@ -408,7 +472,12 @@ Before writing ANY code:
 
 ### Backend Architecture
 
-- **[Prisma Guidelines](docs/prisma.md)** - Comprehensive Prisma ORM patterns, migrations, queries, and best practices
+- **[Project Structure](docs/project-structure.md)** - CoreModule, common folder, essential setup
+- **[Authentication System](docs/authentication-system.md)** - JWT, Passport, 2FA/OTP, password flows
+- **[Prisma Guidelines](docs/prisma.md)** - ORM patterns, migrations, queries, best practices
+- **[File Upload System](docs/file-upload-system.md)** - Complete upload implementation with Multer
+- **[File Upload Quick Reference](docs/file-upload-quick-reference.md)** - Quick upload guide
+- **[File Upload Summary](docs/file-upload-implementation-summary.md)** - Upload summary
 
 ### Key Concepts
 

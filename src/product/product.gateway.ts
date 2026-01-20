@@ -21,13 +21,13 @@ export class ProductGateway
 {
   @WebSocketServer()
   private server: Server;
+  private logger: Logger = new Logger('ProductGateway');
 
   constructor(private authService: AuthService) {}
 
   handleConnection(client: Socket) {
     try {
-      console.log(client);
-      console.log(`Client connected: ${client.id}`);
+      this.logger.log(`Client connected: ${client.id}`);
       this.authService.verifyToken(client.handshake.auth.token);
     } catch (error) {
       throw new WsException('Unauthorized');
@@ -35,7 +35,7 @@ export class ProductGateway
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
+    this.logger.log(`Client disconnected: ${client.id}`);
   }
   sendProductUpdate(product: Partial<Product>) {
     this.server.emit('productUpdate', product);
