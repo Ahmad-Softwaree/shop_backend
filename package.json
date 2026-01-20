@@ -15,6 +15,9 @@
     "prisma:seed": "ts-node prisma/seed.ts",
     "db:seed": "ts-node prisma/seed.ts"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "dependencies": {
     "@faker-js/faker": "^9.9.0",
     "@nestjs/common": "^10.4.22",
@@ -91,9 +94,6 @@
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
-  },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
   },
   "jest": {
     "moduleFileExtensions": [
