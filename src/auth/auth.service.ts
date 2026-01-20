@@ -16,7 +16,6 @@ import {
   Activate2FADto,
 } from './dto/auth.dto';
 import { VerifyOtpDto, ResendOtpDto } from './dto/otp.dto';
-import { User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { ClsService } from 'nestjs-cls';
 import { PrismaService } from 'src/prisma.service';
@@ -30,6 +29,7 @@ import ms from 'ms';
 import { ConfigService } from '@nestjs/config';
 import { EnvironmentVariables } from 'src/core/configuration';
 import { ClsValues } from 'src/core/core.module';
+import { User } from 'src/generated/prisma/client';
 @Injectable()
 export class AuthService {
   constructor(
