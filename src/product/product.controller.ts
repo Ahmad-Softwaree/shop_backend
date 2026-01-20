@@ -104,11 +104,6 @@ export class ProductController {
     return await this.productService.delete(id);
   }
 
-  @Post('/:id/buy')
-  async buyProduct(@Param('id', ParseIntPipe) id: number): Promise<CRUDReturn> {
-    return await this.productService.buyProduct(id);
-  }
-
   @Put('/:id/mark-available')
   async markAvailable(
     @Param('id', ParseIntPipe) id: number,

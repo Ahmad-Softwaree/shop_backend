@@ -156,7 +156,7 @@ export class ProductService {
       },
     });
 
-    this.productGateway.sendProductUpdate(product);
+    this.productGateway.sendProductUpdate();
 
     return {
       message: this.languageService.getText().controller.product.create_success,
@@ -199,7 +199,7 @@ export class ProductService {
       },
     });
 
-    this.productGateway.sendProductUpdate(updatedProduct);
+    this.productGateway.sendProductUpdate();
     return {
       message: this.languageService.getText().controller.product.update_success,
       data: updatedProduct,
@@ -232,52 +232,10 @@ export class ProductService {
       where: { id },
     });
 
+    this.productGateway.sendProductUpdate();
+
     return {
       message: this.languageService.getText().controller.product.delete_success,
-    };
-  }
-
-  async buyProduct(id: number): Promise<CRUDReturn> {
-    const product = await this.prisma.product.findUnique({
-      where: { id },
-    });
-
-    if (!product) {
-      throw new NotFoundException(
-        this.languageService.getText().controller.product.not_found,
-      );
-    }
-
-    // Check if product is already sold
-    if (product.status === 'SOLD_OUT') {
-      throw new ForbiddenException(
-        this.languageService.getText().controller.product.already_sold,
-      );
-    }
-
-    const userId = this.clsService.get('userId');
-
-    if (product.userId === userId) {
-      throw new ForbiddenException(
-        this.languageService.getText().controller.product.cannot_buy_own,
-      );
-    }
-
-    await this.prisma.$transaction([
-      this.prisma.product.update({
-        where: { id },
-        data: { status: 'SOLD_OUT' },
-      }),
-      this.prisma.userOrder.create({
-        data: {
-          userId: userId!,
-          productId: id,
-        },
-      }),
-    ]);
-
-    return {
-      message: this.languageService.getText().controller.product.buy_success,
     };
   }
 
@@ -316,6 +274,7 @@ export class ProductService {
         where: { productId: id },
       }),
     ]);
+    this.productGateway.sendProductUpdate();
 
     return {
       message:
@@ -348,5 +307,6 @@ export class ProductService {
         },
       }),
     ]);
+    this.productGateway.sendProductUpdate();
   }
 }

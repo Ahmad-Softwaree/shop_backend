@@ -37,7 +37,7 @@ export class ProductGateway
   handleDisconnect(client: Socket) {
     this.logger.log(`Client disconnected: ${client.id}`);
   }
-  sendProductUpdate(product: Partial<Product>) {
-    this.server.emit('productUpdate', product);
+  sendProductUpdate() {
+    this.server.emit('productUpdate');
   }
 }
