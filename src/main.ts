@@ -22,7 +22,7 @@ async function bootstrap() {
   });
   const languageService = app.get(LanguageService);
 
-  // app.useLogger(app.get(Logger));
+  app.useLogger(app.get(Logger));
   app.useGlobalPipes(new CustomValidationPipe(languageService));
   app.useGlobalFilters(new GlobalExceptionFilter(), new HttpExceptionFilter());
   app.use(helmet({}));

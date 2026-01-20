@@ -15,29 +15,29 @@ export interface ClsValues extends ClsStore {
 
 @Module({
   imports: [
-    // LoggerModule.forRootAsync({
-    //   imports: [ConfigModule],
-    //   useFactory: (configService: ConfigService<EnvironmentVariables>) => {
-    //     let isProduction =
-    //       configService.getOrThrow<string>('NODE_ENV') === 'production';
-    //     return {
-    //       pinoHttp: {
-    //         level: isProduction ? 'info' : 'debug',
-    //         transport: isProduction
-    //           ? undefined
-    //           : {
-    //               target: 'pino-pretty',
-    //               options: {
-    //                 colorize: true,
-    //                 translateTime: 'SYS:standard',
-    //                 ignore: 'pid,hostname',
-    //               },
-    //             },
-    //       },
-    //     };
-    //   },
-    //   inject: [ConfigService],
-    // }),
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService<EnvironmentVariables>) => {
+        let isProduction =
+          configService.getOrThrow<string>('NODE_ENV') === 'production';
+        return {
+          pinoHttp: {
+            level: isProduction ? 'info' : 'debug',
+            transport: isProduction
+              ? undefined
+              : {
+                  target: 'pino-pretty',
+                  options: {
+                    colorize: true,
+                    translateTime: 'SYS:standard',
+                    ignore: 'pid,hostname',
+                  },
+                },
+          },
+        };
+      },
+      inject: [ConfigService],
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
