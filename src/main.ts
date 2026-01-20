@@ -10,7 +10,9 @@ import { CustomValidationPipe } from './common/pipes/validation.pipe';
 import { LanguageService } from './language/language.service';
 import { Logger } from 'nestjs-pino';
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
+  });
   app.enableCors({
     origin: [app.get(ConfigService).get('FRONT_URL')],
     credentials: true,
@@ -20,7 +22,7 @@ async function bootstrap() {
   });
   const languageService = app.get(LanguageService);
 
-  app.useLogger(app.get(Logger));
+  // app.useLogger(app.get(Logger));
   app.useGlobalPipes(new CustomValidationPipe(languageService));
   app.useGlobalFilters(new GlobalExceptionFilter(), new HttpExceptionFilter());
   app.use(helmet({}));

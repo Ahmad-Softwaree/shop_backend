@@ -24,9 +24,11 @@
     "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^10.4.22",
+    "@nestjs/platform-socket.io": "^11.1.12",
     "@nestjs/schedule": "^6.1.0",
     "@nestjs/serve-static": "^5.0.4",
     "@nestjs/throttler": "^6.5.0",
+    "@nestjs/websockets": "^11.1.12",
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
     "@types/bcrypt": "^6.0.0",
@@ -59,7 +61,8 @@
     "prisma": "^7.2.0",
     "reflect-metadata": "^0.2.2",
     "resend": "^6.7.0",
-    "rxjs": "^7.8.2"
+    "rxjs": "^7.8.2",
+    "stripe": "^20.2.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.4.9",

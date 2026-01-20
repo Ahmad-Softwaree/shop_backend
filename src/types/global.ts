@@ -37,6 +37,7 @@ export type QueryParam = {
   search?: string;
   to?: string;
   from?: string;
+  status?: string;
 };
 
 export type Language = {

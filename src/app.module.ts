@@ -9,6 +9,7 @@ import { PrismaModule } from './prisma.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { ProductModule } from './product/product.module';
 import { SharedModule } from './shared/shared.module';
+import { CheckoutModule } from './checkout/checkout.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SharedModule } from './shared/shared.module';
     ProfileModule,
     ProductModule,
     SharedModule,
+    CheckoutModule,
   ],
   controllers: [],
   providers: [

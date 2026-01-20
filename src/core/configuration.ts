@@ -6,8 +6,12 @@ export interface EnvironmentVariables {
   JWT_EXPIRATION: string;
   COOKIE_NAME: string;
   RESEND_API_KEY: string;
-  NEXT_PUBLIC_APP_URL: string;
-  NEXT_PUBLIC_APP_NAME: string;
+  EMAIL_FROM?: string;
+  STRIPE_SECRET_KEY?: string;
+  FRONT_URL?: string;
+  SUCCESS_URL?: string;
+  CANCEL_URL?: string;
+  STRIPE_WEBHOOK_SECRET?: string;
 }
 
 export default (): EnvironmentVariables => ({
@@ -18,6 +22,10 @@ export default (): EnvironmentVariables => ({
   JWT_EXPIRATION: process.env.JWT_EXPIRATION,
   COOKIE_NAME: process.env.COOKIE_NAME,
   RESEND_API_KEY: process.env.RESEND_API_KEY,
-  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-  NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
+  EMAIL_FROM: process.env.EMAIL_FROM,
+  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+  FRONT_URL: process.env.FRONT_URL,
+  SUCCESS_URL: process.env.SUCCESS_URL,
+  CANCEL_URL: process.env.CANCEL_URL,
+  STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
 });

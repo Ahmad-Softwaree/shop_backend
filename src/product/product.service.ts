@@ -18,6 +18,7 @@ import {
 import { Prisma, Product } from 'src/generated/prisma/client';
 import { buildPagination } from 'lib/functions';
 import { UploadService } from 'src/upload/upload.service';
+import { ProductGateway } from './product.gateway';
 
 @Injectable()
 export class ProductService {
@@ -26,6 +27,7 @@ export class ProductService {
     private languageService: LanguageService,
     private clsService: ClsService<ClsValues>,
     private uploadService: UploadService,
+    private productGateway: ProductGateway,
   ) {}
 
   async get(
@@ -33,9 +35,8 @@ export class ProductService {
     query: QueryParam,
     user?: boolean,
   ): Promise<PaginationType<Partial<Product>>> {
-    console.log('here');
     const { page, limit } = pagination;
-    const { search } = query;
+    const { search, status } = query;
 
     const where: Prisma.ProductWhereInput = {};
 
@@ -47,6 +48,12 @@ export class ProductService {
         { ckbName: { contains: search, mode: 'insensitive' } },
       ];
     }
+
+    // Filter by status
+    if (status && (status === 'AVAILABLE' || status === 'SOLD_OUT')) {
+      where.status = status as any;
+    }
+
     if (user) {
       where.userId = this.clsService.get('userId');
     }
@@ -84,10 +91,18 @@ export class ProductService {
       this.prisma.product.count({ where }),
     ]);
 
+    let mapped = data.map((product) => {
+      return {
+        ...product,
+        name: product[this.languageService.getCurrentLanguage() + 'Name'],
+        desc: product[this.languageService.getCurrentLanguage() + 'Desc'],
+      };
+    });
+
     const meta = buildPagination(total, page, limit);
 
     return {
-      data,
+      data: mapped,
       ...meta,
     };
   }
@@ -124,11 +139,15 @@ export class ProductService {
       );
     }
 
+    product['name'] =
+      product[this.languageService.getCurrentLanguage() + 'Name'];
+    product['desc'] =
+      product[this.languageService.getCurrentLanguage() + 'Desc'];
+
     return { data: product };
   }
 
   async insert(body: CreateProductDto, fileData?: any): Promise<CRUDReturn> {
-    console.log(fileData);
     const product = await this.prisma.product.create({
       data: {
         ...body,
@@ -136,6 +155,8 @@ export class ProductService {
         userId: this.clsService.get('userId')!,
       },
     });
+
+    this.productGateway.sendProductUpdate(product);
 
     return {
       message: this.languageService.getText().controller.product.create_success,
@@ -178,6 +199,7 @@ export class ProductService {
       },
     });
 
+    this.productGateway.sendProductUpdate(updatedProduct);
     return {
       message: this.languageService.getText().controller.product.update_success,
       data: updatedProduct,
@@ -235,14 +257,12 @@ export class ProductService {
 
     const userId = this.clsService.get('userId');
 
-    // Check if user is trying to buy their own product
     if (product.userId === userId) {
       throw new ForbiddenException(
         this.languageService.getText().controller.product.cannot_buy_own,
       );
     }
 
-    // Update product status and create user order
     await this.prisma.$transaction([
       this.prisma.product.update({
         where: { id },
@@ -302,5 +322,31 @@ export class ProductService {
         this.languageService.getText().controller.product
           .mark_available_success,
     };
+  }
+
+  async handleSuccessfulCheckout(
+    productId: number,
+    userId: number,
+  ): Promise<void> {
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+    });
+    if (!product) {
+      throw new NotFoundException(
+        this.languageService.getText().controller.product.not_found,
+      );
+    }
+    await this.prisma.$transaction([
+      this.prisma.product.update({
+        where: { id: productId },
+        data: { status: 'SOLD_OUT' },
+      }),
+      this.prisma.userOrder.create({
+        data: {
+          userId: userId!,
+          productId: productId,
+        },
+      }),
+    ]);
   }
 }

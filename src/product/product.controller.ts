@@ -65,10 +65,10 @@ export class ProductController {
     allowedTypes: /\.(jpg|jpeg|png|gif|webp)$/i,
   })
   @UseInterceptors(
-    EmptyBodyInterceptor,
     FileInterceptor('image', getMulterOptions()),
     FileUploadInterceptor,
     FileCleanupInterceptor,
+    EmptyBodyInterceptor,
   )
   async create(
     @Body() body: CreateProductDto,
@@ -86,10 +86,10 @@ export class ProductController {
     allowedTypes: /\.(jpg|jpeg|png|gif|webp)$/i,
   })
   @UseInterceptors(
-    EmptyBodyInterceptor,
     FileInterceptor('image', getMulterOptions()),
     FileUploadInterceptor,
     FileCleanupInterceptor,
+    EmptyBodyInterceptor,
   )
   async update(
     @Param('id', ParseIntPipe) id: number,
