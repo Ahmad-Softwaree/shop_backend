@@ -1,12 +1,7 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
 import { PrismaService } from 'src/prisma.service';
 import { UpdateProfileDto } from './dto/profile.dto';
-import { User } from '@prisma/client';
 import { LanguageService } from 'src/language/language.service';
 import { MessageResponse } from 'src/types/global';
 
