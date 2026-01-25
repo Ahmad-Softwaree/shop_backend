@@ -228,7 +228,7 @@ export class AuthService {
     });
 
     // Send password reset email
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/update-password?token=${token}`;
+    const resetUrl = `${process.env.FRONT_URL || 'http://localhost:3000'}/update-password?token=${token}`;
     const lang = this.languageService.getCurrentLanguage() as Language;
 
     await this.emailService.sendEmail({
